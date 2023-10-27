@@ -75,6 +75,7 @@ CREATE TABLE detalles_transferencias_productos(
 	FOREIGN KEY (id_transferencia) REFERENCES transferencias_productos(id_transferencia),
 	FOREIGN KEY (id_producto) REFERENCES productos(id_producto),
 );
+
 CREATE TABLE facturas (
 	id_factura INT PRIMARY KEY IDENTITY(1,1),
 	id_deposito INT,
@@ -83,13 +84,15 @@ CREATE TABLE facturas (
 	condicion_compra BIT NOT NULL,
 	fecha_vencimiento DATE NOT NULL,
 	numero_factura INT NOT NULL,
+	total INT NOT NULL,
+	saldo_pendiente INT NOT NULL,
 	FOREIGN KEY (id_deposito) REFERENCES depositos(id_deposito),
 	FOREIGN KEY (id_proveedor) REFERENCES proveedores(id_proveedor)
 );
 CREATE TABLE detalles_compras_proveedores(
 	id_detalle_compra_proveedor INT PRIMARY KEY IDENTITY(1,1),
-	id_producto INT,
-	id_factura INT,
+	id_producto INT NOT NULL,
+	id_factura INT NOT NULL,
 	cantidad INT NOT NULL,
 	costo_unitario INT NOT NULL,
 	FOREIGN KEY (id_producto) REFERENCES productos(id_producto),
@@ -106,12 +109,16 @@ CREATE TABLE detalles_ordenes_de_pagos(
 	id_detalle_orden_de_pago INT PRIMARY KEY IDENTITY(1,1),
 	id_factura INT,
 	id_orden_de_pago INT,
-	id_metodo_de_pago INT,
 	importe INT NOT NULL,
 	FOREIGN KEY (id_factura) REFERENCES facturas(id_factura),
-	FOREIGN KEY (id_orden_de_pago) REFERENCES ordenes_de_pagos(id_orden_de_pago),
-	FOREIGN KEY (id_metodo_de_pago) REFERENCES metodos_de_pago(id_metodo_pago)
+	FOREIGN KEY (id_orden_de_pago) REFERENCES ordenes_de_pagos(id_orden_de_pago)
 );
+CREATE TABLE detalles_metodos_de_pagos(
+	id_detalle_metodo_de_pago INT PRIMARY KEY IDENTITY(1,1),
+	id_metodo_pago INT,
+	importe INT NOT NULL,
+	FOREIGN KEY (id_metodo_pago) REFERENCES metodos_de_pago(id_metodo_pago)
+)
 --Carga de datos
 INSERT INTO tipos_productos (nombre)
 VALUES ('Shampoo'),
@@ -211,3 +218,101 @@ VALUES
     ('Margarita SA', 'Ciudad del Este', 'margarita.sa@gmail.com', 4000000),
     ('San Cosme', 'Asunción', 'sancosme@gmail.com', 12000000);
 
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,fecha_vencimiento,numero_factura,total,saldo_pendiente)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='Margarita SA'),
+		(GETDATE()),
+		0,
+		(GETDATE()),
+		1,
+		0,
+		0);
+
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,fecha_vencimiento,numero_factura,total,saldo_pendiente)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='San Cosme'),
+		(GETDATE()),
+		1,
+		(GETDATE()),
+		3,
+		0,
+		0);
+
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,fecha_vencimiento,numero_factura,total,saldo_pendiente)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='Estética del Sur'),
+		(GETDATE()),
+		3,
+		(GETDATE()),
+		2,
+		0,
+		0);
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Nivea'),
+		(SELECT id_factura FROM facturas WHERE id_factura=7),
+		4,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo Nivea'));
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Shampoo TRESemme'),
+		(SELECT id_factura FROM facturas WHERE id_factura=8),
+		2,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo TRESemme'));
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Nivea'),
+		(SELECT id_factura FROM facturas WHERE id_factura=8),
+		3,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo Nivea'));
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Tinte Plusbelle'),
+		(SELECT id_factura FROM facturas WHERE id_factura=7),
+		1,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Tinte Plusbelle'));
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='gel Plusbelle'),
+		(SELECT id_factura FROM facturas WHERE id_factura=7),
+		1,
+		(SELECT costo_unitario FROM productos WHERE descripcion='gel Plusbelle'));
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Gel Tresemme'),
+		(SELECT id_factura FROM facturas WHERE id_factura=6),
+		2,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Gel Tresemme'));
+
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Tresemme'),
+		(SELECT id_factura FROM facturas WHERE id_factura=6),
+		4,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo Tresemme'));
+
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='tinte Tresemme'),
+		(SELECT id_factura FROM facturas WHERE id_factura=6),
+		3,
+		(SELECT costo_unitario FROM productos WHERE descripcion='tinte Tresemme'));
+--Ver todas las tablas
+SELECT * FROM sys.tables;
+
+--Ver opciones de algo
+exec sp_columns FACTURAS;
+
+--Ver columnas de algo
+SELECT * FROM detalles_compras_proveedores
