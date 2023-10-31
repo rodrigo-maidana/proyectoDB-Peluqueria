@@ -312,7 +312,51 @@ VALUES (
 SELECT * FROM sys.tables;
 
 --Ver opciones de algo
-exec sp_columns FACTURAS;
+exec sp_columns detalles_compras_proveedores;
 
 --Ver columnas de algo
 SELECT * FROM detalles_compras_proveedores
+
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,fecha_vencimiento,numero_factura,total,saldo_pendiente)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='Estética del Sur'),
+		(GETDATE()),
+		0,
+		(GETDATE()),
+		77,
+		0,
+		0);
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Tresemme'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=77),
+		15,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo Tresemme'));
+
+SELECT * FROM productos_por_depositos AS d
+INNER JOIN productos AS p ON d.id_producto = p.id_producto
+WHERE p.descripcion = 'Shampoo'; -- Asegúrate de rodear 'TRESemme' con comillas simples si es una cadena de texto
+
+
+SELECT * FROM productos_por_depositos AS d
+INNER JOIN productos AS p ON d.id_producto = p.id_producto
+
+GO
+
+CREATE TRIGGER tr_actualizar_productos_por_deposito
+ON detalles_compras_proveedores
+AFTER INSERT
+AS
+BEGIN
+    -- Actualizar la cantidad en productos_por_depositos basado en los nuevos detalles de compra
+    UPDATE p
+    SET p.cantidad = p.cantidad + i.cantidad
+    FROM productos_por_depositos p
+    INNER JOIN inserted i ON p.id_producto = i.id_producto
+    INNER JOIN facturas f ON i.id_factura = f.id_factura
+    WHERE p.id_deposito = f.id_deposito;
+END;
+
+
