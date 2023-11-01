@@ -225,7 +225,7 @@ VALUES(
 		(GETDATE()),
 		0,
 		(GETDATE()),
-		1,
+		1010,
 		0,
 		0);
 
@@ -236,7 +236,7 @@ VALUES(
 		(GETDATE()),
 		1,
 		(GETDATE()),
-		3,
+		1011,
 		0,
 		0);
 
@@ -245,51 +245,51 @@ VALUES(
 		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
 		(SELECT id_proveedor FROM proveedores WHERE nombre='Estética del Sur'),
 		(GETDATE()),
-		3,
+		0,
 		(GETDATE()),
-		2,
+		1012,
 		0,
 		0);
 
 INSERT INTO detalles_compras_proveedores
 VALUES (
 		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Nivea'),
-		(SELECT id_factura FROM facturas WHERE id_factura=7),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1010),
 		4,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo Nivea'));
 
 INSERT INTO detalles_compras_proveedores
 VALUES (
 		(SELECT id_producto FROM productos WHERE descripcion='Shampoo TRESemme'),
-		(SELECT id_factura FROM facturas WHERE id_factura=8),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1010),
 		2,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo TRESemme'));
 
 INSERT INTO detalles_compras_proveedores
 VALUES (
 		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Nivea'),
-		(SELECT id_factura FROM facturas WHERE id_factura=8),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1010),
 		3,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo Nivea'));
 
 INSERT INTO detalles_compras_proveedores
 VALUES (
 		(SELECT id_producto FROM productos WHERE descripcion='Tinte Plusbelle'),
-		(SELECT id_factura FROM facturas WHERE id_factura=7),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1011),
 		1,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Tinte Plusbelle'));
 
 INSERT INTO detalles_compras_proveedores
 VALUES (
 		(SELECT id_producto FROM productos WHERE descripcion='gel Plusbelle'),
-		(SELECT id_factura FROM facturas WHERE id_factura=7),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1011),
 		1,
 		(SELECT costo_unitario FROM productos WHERE descripcion='gel Plusbelle'));
 
 INSERT INTO detalles_compras_proveedores
 VALUES (
 		(SELECT id_producto FROM productos WHERE descripcion='Gel Tresemme'),
-		(SELECT id_factura FROM facturas WHERE id_factura=6),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1011),
 		2,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Gel Tresemme'));
 
@@ -297,7 +297,7 @@ VALUES (
 INSERT INTO detalles_compras_proveedores
 VALUES (
 		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Tresemme'),
-		(SELECT id_factura FROM facturas WHERE id_factura=6),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1012),
 		4,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo Tresemme'));
 
@@ -305,9 +305,28 @@ VALUES (
 INSERT INTO detalles_compras_proveedores
 VALUES (
 		(SELECT id_producto FROM productos WHERE descripcion='tinte Tresemme'),
-		(SELECT id_factura FROM facturas WHERE id_factura=6),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1012),
 		3,
 		(SELECT costo_unitario FROM productos WHERE descripcion='tinte Tresemme'));
+
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,fecha_vencimiento,numero_factura,total,saldo_pendiente)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='Estética del Sur'),
+		(GETDATE()),
+		0,
+		(GETDATE()),
+		1013,
+		0,
+		0);
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Tresemme'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1013),
+		15,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo Tresemme'));
+
 --Ver todas las tablas
 SELECT * FROM sys.tables;
 
@@ -317,28 +336,9 @@ exec sp_columns detalles_compras_proveedores;
 --Ver columnas de algo
 SELECT * FROM detalles_compras_proveedores
 
-INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,fecha_vencimiento,numero_factura,total,saldo_pendiente)
-VALUES(
-		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
-		(SELECT id_proveedor FROM proveedores WHERE nombre='Estética del Sur'),
-		(GETDATE()),
-		0,
-		(GETDATE()),
-		77,
-		0,
-		0);
-
-INSERT INTO detalles_compras_proveedores
-VALUES (
-		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Tresemme'),
-		(SELECT id_factura FROM facturas WHERE numero_factura=77),
-		15,
-		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo Tresemme'));
-
 SELECT * FROM productos_por_depositos AS d
 INNER JOIN productos AS p ON d.id_producto = p.id_producto
 WHERE p.descripcion = 'Shampoo'; -- Asegúrate de rodear 'TRESemme' con comillas simples si es una cadena de texto
-
 
 SELECT * FROM productos_por_depositos AS d
 INNER JOIN productos AS p ON d.id_producto = p.id_producto
