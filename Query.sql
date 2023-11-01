@@ -162,6 +162,7 @@ VALUES
     ((SELECT id_marca FROM marcas WHERE nombre = 'Nivea'), (SELECT id_tipo_producto FROM tipos_productos WHERE nombre = 'Tinte'), 'Tinte Nivea', 40000, 10),
     ((SELECT id_marca FROM marcas WHERE nombre = 'Nivea'), (SELECT id_tipo_producto FROM tipos_productos WHERE nombre = 'Gel'), 'Gel Nivea', 35000, 10);
 
+
 -- Insertar productos de ejemplo para TRESemme
 INSERT INTO productos (id_marca, id_tipo_producto, descripcion, costo_unitario, porcentaje_iva)
 VALUES
@@ -334,14 +335,15 @@ SELECT * FROM sys.tables;
 exec sp_columns detalles_compras_proveedores;
 
 --Ver columnas de algo
-SELECT * FROM detalles_compras_proveedores
-
 SELECT * FROM productos_por_depositos AS d
 INNER JOIN productos AS p ON d.id_producto = p.id_producto
 WHERE p.descripcion = 'Shampoo'; -- Asegúrate de rodear 'TRESemme' con comillas simples si es una cadena de texto
 
 SELECT * FROM productos_por_depositos AS d
 INNER JOIN productos AS p ON d.id_producto = p.id_producto
+
+SELECT * FROM vista_productos_depositos;
+
 
 GO
 
@@ -358,5 +360,13 @@ BEGIN
     INNER JOIN facturas f ON i.id_factura = f.id_factura
     WHERE p.id_deposito = f.id_deposito;
 END;
+
+GO
+CREATE VIEW vista_productos_depositos AS
+SELECT p.descripcion AS nombre_producto, d.cantidad, dep.nombre AS nombre_deposito
+FROM productos_por_depositos AS d
+INNER JOIN productos AS p ON d.id_producto = p.id_producto
+INNER JOIN depositos AS dep ON d.id_deposito = dep.id_deposito;
+
 
 
