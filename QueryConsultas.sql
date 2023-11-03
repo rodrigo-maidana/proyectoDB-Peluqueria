@@ -1,3 +1,4 @@
+USE ProyectoPeluqueria
 --consultas
 --ranking de productos comprados por cantidad
 create view ranking_productos as
@@ -22,7 +23,9 @@ from facturas f
 inner join proveedores p on p.id_proveedor=f.id_proveedor
 group by p.nombre, f.total
 
+
 select * from facturas
+
 EXEC sumar_detalles_factura @id_factura=4;
 
 select * from ranking_proveedores order by monto desc
