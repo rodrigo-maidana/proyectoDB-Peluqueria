@@ -1,6 +1,6 @@
 USE ProyectoPeluqueria
 
-CREATE VIEW VistaCantidadProductos AS
+CREATE VIEW rep_productos_por_deposito AS
 SELECT
     d.nombre AS NombreDeposito,
     p.descripcion AS DescripcionProducto,
@@ -9,7 +9,7 @@ FROM productos_por_depositos ppd
 INNER JOIN depositos d ON ppd.id_deposito = d.id_deposito
 INNER JOIN productos p ON ppd.id_producto = p.id_producto;
 
-CREATE VIEW VistaExistenciaProductos AS
+CREATE VIEW rep_total_productos AS
 SELECT
     p.id_producto,
     p.descripcion AS Producto,
@@ -22,7 +22,7 @@ GROUP BY
     p.id_producto, p.descripcion;
 
 -- Crear una vista de facturas de proveedores vencidas con nombres de proveedores
-CREATE VIEW FacturasVencidas AS
+CREATE VIEW rep_facturas_vencidas AS
 SELECT
     f.id_factura,
     p.nombre AS nombre_proveedor,
@@ -40,6 +40,6 @@ WHERE
     f.fecha_vencimiento < GETDATE(); -- Filtrar facturas vencidas
 
 
-select * from VistaCantidadProductos Where DescripcionProducto ='shampoo nivea';
-select * from VistaExistenciaProductos Where producto ='shampoo nivea';
-select * from FacturasVencidas
+select * from rep_productos_por_deposito Where DescripcionProducto ='shampoo nivea';
+select * from rep_total_productos Where producto ='shampoo nivea';
+select * from rep_facturas_vencidas
