@@ -81,7 +81,7 @@ CREATE TABLE facturas (
 	id_deposito INT,
 	id_proveedor INT,
 	fecha_compra DATE NOT NULL,
-	condicion_compra BIT NOT NULL,
+	condicion_compra BIT NOT NULL,  -- 0 es contado, 1 credito
 	fecha_vencimiento DATE NOT NULL,
 	numero_factura INT NOT NULL,
 	total INT NOT NULL,
