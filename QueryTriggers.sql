@@ -35,3 +35,4 @@ BEGIN
     INNER JOIN facturas f ON i.id_factura = f.id_factura
     WHERE p.id_deposito = f.id_deposito;
 END;
+

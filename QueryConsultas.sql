@@ -44,7 +44,7 @@ GROUP BY
 
 --consulta
 select * from VistaImporteTotalComprasPorFecha 
-WHERE fecha_compra BETWEEN '2023-01-01' AND '2023-12-31'
+WHERE fecha_compra BETWEEN '2023-10-01' AND '2023-10-31'
 ORDER BY
     fecha_compra;
 
@@ -69,8 +69,7 @@ GROUP BY
 --consulta
 -- Consulta por rango de proveedores y rango de fechas
 -- VER SI FUNCIONA, CARGAR MAS DATOS
-SELECT *
-FROM ProductosCompradosAProveedores
+SELECT * FROM ProductosCompradosAProveedores
 WHERE IDProveedor BETWEEN 1 AND 3
   AND UltimaFechaCompra BETWEEN '2023-01-01' AND '2023-12-31';
 
@@ -78,3 +77,18 @@ WHERE IDProveedor BETWEEN 1 AND 3
 select dcp.id_factura, p.descripcion, dcp.cantidad,dcp.costo_unitario from detalles_compras_proveedores dcp
 inner join productos p on dcp.id_producto = p.id_producto
 order by p.descripcion
+
+CREATE VIEW facturas_pendientes_pago AS
+SELECT
+f.id_factura as IdFactura,
+f.fecha_compra as Fecha,
+f.id_proveedor as CodigoProveedor,
+p.nombre as NombreProveedor,
+f.total as Total,
+f.saldo_pendiente as Pendiente
+FROM facturas f
+INNER JOIN proveedores p on f.id_proveedor = p.id_proveedor
+WHERE f.saldo_pendiente > 0
+
+select * from facturas_pendientes_pago
+select * from facturas
