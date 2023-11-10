@@ -34,3 +34,4 @@ END;
 
 select * from facturas
 exec sumar_detalles_factura @id_factura=2
+
