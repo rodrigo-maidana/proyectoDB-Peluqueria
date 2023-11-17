@@ -262,4 +262,3 @@ VALUES (
 		0);
 
 select * from facturas
-select * from detalles_compras_proveedores

@@ -90,5 +90,19 @@ FROM facturas f
 INNER JOIN proveedores p on f.id_proveedor = p.id_proveedor
 WHERE f.saldo_pendiente > 0
 
+CREATE VIEW vw_productos_comprados
+AS
+SELECT p.id_producto, p.descripcion as nombre_producto, prov.id_proveedor, prov.nombre as nombre_proveedor
+FROM detalles_compras_proveedores AS d
+INNER JOIN productos AS p
+ON d.id_producto = p.id_producto
+INNER JOIN facturas AS f
+ON f.id_factura = d.id_factura
+INNER JOIN proveedores AS prov
+ON f.id_proveedor = prov.id_proveedor
+
+select * from vw_productos_comprados
+order by nombre_producto
+
 select * from facturas_pendientes_pago
 select * from facturas
