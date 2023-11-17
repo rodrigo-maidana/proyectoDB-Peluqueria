@@ -132,3 +132,28 @@ BEGIN
 
     EXEC sumar_detalles_factura @id_factura = @id_factura;
 END;
+--actualizar detalles_ordenes_de_pago
+-- Crear un trigger después de actualizar en detalles_ordenes_de_pagos
+CREATE TRIGGER tr_actualizar_saldo_pendiente_al_editar
+ON detalles_ordenes_de_pagos
+AFTER UPDATE
+AS
+BEGIN
+    -- Actualizar importe en la tabla detalles_ordenes_de_pagos
+    UPDATE dop
+    SET importe = i.importe
+    FROM detalles_ordenes_de_pagos dop
+    JOIN inserted i ON dop.id_detalle_orden_de_pago = i.id_detalle_orden_de_pago;
+
+    -- Actualizar saldo_pendiente en la tabla facturas
+    UPDATE f
+	--resta el total de la factura con la suma de todos los importes de ordenes de pago
+	-- si no hay detalles ordenes de pago isnull retorna 0
+    SET saldo_pendiente = f.total - ISNULL((SELECT SUM(importe) FROM detalles_ordenes_de_pagos WHERE id_factura = f.id_factura), 0)
+    FROM facturas f
+    JOIN detalles_ordenes_de_pagos dop ON f.id_factura = dop.id_factura;
+	UPDATE o
+    SET monto_total = ISNULL((SELECT SUM(importe) FROM detalles_ordenes_de_pagos WHERE id_orden_de_pago = o.id_orden_de_pago), 0)
+    FROM ordenes_de_pagos o
+    JOIN inserted i ON o.id_orden_de_pago = i.id_orden_de_pago;
+END;
