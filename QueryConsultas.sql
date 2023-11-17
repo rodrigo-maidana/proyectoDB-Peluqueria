@@ -40,7 +40,7 @@ SELECT
 FROM facturas f
 INNER JOIN depositos d on f.id_deposito = d.id_deposito
 GROUP BY
-     f.fecha_compra,f.id_deposito,d.nombre;
+f.fecha_compra,f.id_deposito,d.nombre;
 
 --consulta
 select * from VistaImporteTotalComprasPorFecha 
