@@ -182,3 +182,26 @@ BEGIN
     FROM ordenes_de_pagos o
     JOIN inserted i ON o.id_orden_de_pago = i.id_orden_de_pago;
 END;
+-- Trigger al eliminar en detalles_ordenes_de_pagos
+CREATE TRIGGER tr_eliminar_detalle_orden_de_pago
+ON detalles_ordenes_de_pagos
+AFTER DELETE
+AS
+BEGIN
+    -- Declarar variables para almacenar el id_factura y el importe eliminado
+    DECLARE @id_factura INT, @importe_eliminar INT;
+
+    -- Obtener el id_factura y el importe eliminado
+    SELECT @id_factura = id_factura, @importe_eliminar = importe
+    FROM deleted;
+
+    -- Se actualiza ordenes de pago en el atributo monto_total
+    UPDATE ordenes_de_pagos
+    SET monto_total = monto_total - @importe_eliminar
+    WHERE id_orden_de_pago = (SELECT id_orden_de_pago FROM deleted);
+
+    -- Se actualiza el saldo pendiente en factura
+    UPDATE facturas
+    SET saldo_pendiente = saldo_pendiente + @importe_eliminar
+    WHERE id_factura = @id_factura;
+END;
