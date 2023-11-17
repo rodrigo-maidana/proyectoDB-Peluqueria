@@ -1,4 +1,5 @@
 USE ProyectoPeluqueria
+
 select * from facturas
 --facturas mes diciembre
 INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
