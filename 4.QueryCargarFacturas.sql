@@ -1,6 +1,109 @@
 USE ProyectoPeluqueria
 
 select * from facturas
+
+--FACTURA NRO 1010.
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='Margarita SA'),
+		(GETDATE()),
+		0,
+		(GETDATE()),
+		1010,
+		0,
+		0,
+		0);
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Nivea'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1010),
+		4,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo Nivea'),
+		0);
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Shampoo TRESemme'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1010),
+		2,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo TRESemme'),
+		0);
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Nivea'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1010),
+		3,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo Nivea'),
+		0);
+
+--FACTURA NRO 1011.
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='San Cosme'),
+		(GETDATE()),
+		1,
+		(GETDATE()),
+		1011,
+		0,
+		0,
+		0);
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Tinte Plusbelle'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1011),
+		1,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Tinte Plusbelle'),
+		0);
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='gel Plusbelle'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1011),
+		1,
+		(SELECT costo_unitario FROM productos WHERE descripcion='gel Plusbelle'),
+		0);
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Gel Tresemme'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1011),
+		2,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Gel Tresemme'),
+		0);
+
+--FACTURA NRO 1010.
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='Estética del Sur'),
+		(GETDATE()),
+		0,
+		(GETDATE()),
+		1012,
+		0,
+		0,
+		0);
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Tresemme'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1012),
+		4,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo Tresemme'),
+		0);
+
+INSERT INTO detalles_compras_proveedores
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='tinte Tresemme'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=1012),
+		3,
+		(SELECT costo_unitario FROM productos WHERE descripcion='tinte Tresemme'),
+		0);
+
 --facturas mes diciembre
 INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
 fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
@@ -26,7 +129,7 @@ VALUES (
 		4,
 		26500,
 		0);
-exec sumar_detalles_factura @id_factura=6
+
 INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
 fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
 VALUES(
@@ -39,6 +142,7 @@ VALUES(
 		0,
 		0,
 		0);
+
 INSERT INTO detalles_compras_proveedores
 VALUES (
 		(SELECT id_producto FROM productos WHERE descripcion='Gel TRESemme'),
@@ -51,8 +155,7 @@ VALUES (
 		4,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Tinte TRESemme'),
 		0);
-exec sumar_detalles_factura @id_factura=7
-select * from facturas
+
 --facturas mes octubre
 INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
 fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
@@ -78,8 +181,7 @@ VALUES (
 		3,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Tinte Plusbelle'),
 		0);
-exec sumar_detalles_factura @id_factura=8
-select * from facturas
+
 INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
 fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
 VALUES(
@@ -105,8 +207,7 @@ VALUES (
 		21,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Acondicionador Plusbelle'),
 		0);
-exec sumar_detalles_factura @id_factura=9
-select * from facturas
+
 --facturas mes septiembre
 INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
 fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
@@ -133,8 +234,7 @@ VALUES (
 		14,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Tinte TRESemme'),
 		0);
-exec sumar_detalles_factura @id_factura=10
-select * from facturas
+
 INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
 fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
 VALUES(
@@ -160,5 +260,6 @@ VALUES (
 		50,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Acondicionador TRESemme'),
 		0);
-exec sumar_detalles_factura @id_factura=11
+
 select * from facturas
+select * from detalles_compras_proveedores
