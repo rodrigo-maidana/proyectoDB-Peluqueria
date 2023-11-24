@@ -1,5 +1,35 @@
 USE ProyectoPeluqueria
 
+CREATE TRIGGER tr_control_transferencias_negativas
+ON detalles_transferencias_productos
+INSTEAD OF INSERT
+AS
+BEGIN
+    -- Verificar si la cantidad a transferir excede la cantidad disponible en el depósito de origen
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        INNER JOIN productos_por_depositos pd ON i.id_producto = pd.id_producto
+        INNER JOIN transferencias_productos tp ON i.id_transferencia = tp.id_transferencia
+        WHERE i.cantidad > pd.cantidad
+          AND tp.id_deposito_origen = pd.id_deposito
+    )
+    BEGIN
+        PRINT 'La cantidad a transferir excede la cantidad disponible en el depósito de origen.';
+        ROLLBACK;
+    END
+    ELSE
+    BEGIN
+        -- Si la validación es exitosa, realizar la inserción
+        INSERT INTO detalles_transferencias_productos (id_transferencia, id_producto, cantidad)
+        SELECT id_transferencia, id_producto, cantidad
+        FROM inserted;
+    END
+END;
+
+
+
+
 -- Crear el trigger
 CREATE TRIGGER tr_insert_actualizar_depositos_al_transferir
 ON detalles_transferencias_productos
@@ -203,5 +233,85 @@ BEGIN
     -- Se actualiza el saldo pendiente en factura
     UPDATE facturas
     SET saldo_pendiente = saldo_pendiente + @importe_eliminar
+    WHERE id_factura = @id_factura;
+END;
+
+CREATE TRIGGER tr_insertar_detalle_compra
+ON detalles_compras_proveedores
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @id_factura INT
+    DECLARE @credito_proveedor INT
+    -- Iniciar la transacción
+    BEGIN TRANSACTION;
+    -- Obtener el id_factura recién insertado
+    SELECT @id_factura = id_factura FROM INSERTED;
+
+    -- Ejecutar el procedimiento almacenado para actualizar la factura
+    EXEC sumar_detalles_factura @id_factura = @id_factura;
+
+    -- Calcular la diferencia entre el total de la factura y el crédito del proveedor
+    SELECT @credito_proveedor = p.credito - f.total FROM proveedores p
+    INNER JOIN facturas f ON p.id_proveedor = f.id_proveedor
+    WHERE f.id_factura = @id_factura;
+
+    -- Verificar si el crédito se vuelve negativo
+    IF @credito_proveedor >= 0
+    BEGIN
+        -- Actualizar el crédito del proveedor
+        UPDATE proveedores
+        SET credito = @credito_proveedor
+        WHERE id_proveedor = (SELECT id_proveedor FROM facturas WHERE id_factura = @id_factura);
+
+        -- Confirmar la transacción
+        COMMIT;
+    END
+
+    ELSE
+    BEGIN
+        -- Si el crédito se vuelve negativo, deshacer la transacción
+        ROLLBACK;
+        -- Lanzar un mensaje de advertencia
+         PRINT 'El total de la factura supera el crédito disponible del proveedor. El detalle compra proveedor no se ha guardado.'
+    END;
+END;
+
+
+CREATE TRIGGER tr_actualizar_detalle_compra
+ON detalles_compras_proveedores
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @id_factura INT
+    DECLARE @credito_proveedor_anterior INT
+    DECLARE @credito_proveedor_nuevo INT
+
+    -- Obtener el id_factura y el monto anterior
+    SELECT @id_factura = id_factura, @credito_proveedor_anterior = cantidad * costo_unitario
+    FROM DELETED;
+
+    -- Sumar el monto anterior al crédito del proveedor
+    UPDATE proveedores
+    SET credito = credito + @credito_proveedor_anterior
+    WHERE id_proveedor = (SELECT id_proveedor FROM facturas WHERE id_factura = @id_factura);
+
+    -- Obtener el nuevo monto
+    SELECT @credito_proveedor_nuevo = cantidad * costo_unitario FROM INSERTED;
+
+    -- Restar el nuevo monto al crédito del proveedor
+    UPDATE proveedores
+    SET credito = credito - @credito_proveedor_nuevo
+    WHERE id_proveedor = (SELECT id_proveedor FROM facturas WHERE id_factura = @id_factura);
+
+    -- Restar el nuevo monto al total de la factura
+    UPDATE facturas
+    SET total = total - @credito_proveedor_nuevo,
+        saldo_pendiente = CASE
+                            WHEN condicion_compra = 1 THEN total - @credito_proveedor_nuevo
+                            ELSE 0
+                         END
     WHERE id_factura = @id_factura;
 END;
