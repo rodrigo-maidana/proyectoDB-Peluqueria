@@ -1,5 +1,6 @@
 USE ProyectoPeluqueria
 
+--control de transferencia negativa
 CREATE TRIGGER tr_control_transferencias_negativas
 ON detalles_transferencias_productos
 INSTEAD OF INSERT
@@ -28,9 +29,7 @@ BEGIN
 END;
 
 
-
-
--- Crear el trigger
+--actualizar productos_por_depositos despues de la insercion
 CREATE TRIGGER tr_insert_actualizar_depositos_al_transferir
 ON detalles_transferencias_productos
 AFTER INSERT
@@ -100,13 +99,16 @@ BEGIN
 END;
 
 
-DROP TRIGGER tr_actualizar_productos_por_deposito
+DROP TRIGGER tr_insert_actualizar_productos_por_deposito
 
 CREATE TRIGGER tr_insert_actualizar_productos_por_deposito
 ON detalles_compras_proveedores
 AFTER INSERT
 AS
 BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRANSACTION;
+
     -- Actualizar la cantidad en productos_por_depositos basado en los nuevos detalles de compra
     UPDATE p
     SET p.cantidad = p.cantidad + i.cantidad
@@ -115,12 +117,51 @@ BEGIN
     INNER JOIN facturas f ON i.id_factura = f.id_factura
     WHERE p.id_deposito = f.id_deposito;
 
-	-- Llamada al procedimiento almacenado sumar_detalles_factura para la factura recién insertada
+    -- Llamada al procedimiento almacenado sumar_detalles_factura para la factura recién insertada
     DECLARE @id_factura INT;
-    SELECT @id_factura = id_factura FROM inserted;
+    DECLARE @id_producto INT;
+    DECLARE @ultimoCosto INT;
+    DECLARE @credito_proveedor INT;
+
+    SELECT @id_factura = id_factura, @id_producto = id_producto, @ultimoCosto = costo_unitario FROM inserted;
 
     EXEC sumar_detalles_factura @id_factura = @id_factura;
+    EXEC act_costo_unitario @id_producto = @id_producto, @costoActualizado = @ultimoCosto;
+
+    -- Verificar si la factura es a crédito antes de calcular el crédito del proveedor
+    IF (SELECT condicion_compra FROM facturas WHERE id_factura = @id_factura) = 1
+    BEGIN
+        -- Calcular la diferencia entre el total de la factura y el crédito del proveedor
+        SELECT @credito_proveedor = p.credito - f.total FROM proveedores p
+        INNER JOIN facturas f ON p.id_proveedor = f.id_proveedor
+        WHERE f.id_factura = @id_factura;
+
+        -- Verificar si el crédito se vuelve negativo
+        IF @credito_proveedor >= 0
+        BEGIN
+            -- Actualizar el crédito del proveedor
+            UPDATE proveedores
+            SET credito = @credito_proveedor
+            WHERE id_proveedor = (SELECT id_proveedor FROM facturas WHERE id_factura = @id_factura);
+
+            -- Confirmar la transacción
+            COMMIT;
+        END
+        ELSE
+        BEGIN
+            -- Si el crédito se vuelve negativo, deshacer la transacción
+            ROLLBACK;
+            -- Lanzar un mensaje de advertencia
+            PRINT 'El total de la factura supera el crédito disponible del proveedor. El detalle compra proveedor no se ha guardado.'
+        END;
+    END
+    ELSE
+    BEGIN
+        -- Si la factura no es a crédito, confirmar la transacción
+        COMMIT;
+    END;
 END;
+
 
 CREATE TRIGGER tr_delete_actualizar_depositos_al_transferir
 ON detalles_compras_proveedores
@@ -158,9 +199,30 @@ BEGIN
 
     -- Llamada al procedimiento almacenado sumar_detalles_factura para la factura correspondiente a los detalles modificados
     DECLARE @id_factura INT;
-    SELECT @id_factura = i.id_factura FROM inserted i;
+	DECLARE @id_producto INT;
+	DECLARE @costoProducto INT;
+	DECLARE @credito_proveedor_anterior INT
+    DECLARE @credito_proveedor_nuevo INT
+
+    SELECT @id_factura = i.id_factura,@costoProducto = costo_unitario, @id_producto = id_producto FROM inserted i;
 
     EXEC sumar_detalles_factura @id_factura = @id_factura;
+	EXEC act_costo_unitario @id_producto = @id_producto, @costoActualizado = @costoProducto;
+
+	SELECT @id_factura = id_factura, @credito_proveedor_anterior = cantidad * costo_unitario
+    FROM DELETED;
+	-- Sumar el monto anterior al crédito del proveedor
+    UPDATE proveedores
+    SET credito = credito + @credito_proveedor_anterior
+    WHERE id_proveedor = (SELECT id_proveedor FROM facturas WHERE id_factura = @id_factura);
+
+	-- Obtener el nuevo monto
+    SELECT @credito_proveedor_nuevo = cantidad * costo_unitario FROM INSERTED;
+
+    -- Restar el nuevo monto al crédito del proveedor
+    UPDATE proveedores
+    SET credito = credito - @credito_proveedor_nuevo
+    WHERE id_proveedor = (SELECT id_proveedor FROM facturas WHERE id_factura = @id_factura);
 END;
 
 
@@ -234,48 +296,6 @@ BEGIN
     UPDATE facturas
     SET saldo_pendiente = saldo_pendiente + @importe_eliminar
     WHERE id_factura = @id_factura;
-END;
-
-CREATE TRIGGER tr_insertar_detalle_compra
-ON detalles_compras_proveedores
-AFTER INSERT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    DECLARE @id_factura INT
-    DECLARE @credito_proveedor INT
-    -- Iniciar la transacción
-    BEGIN TRANSACTION;
-    -- Obtener el id_factura recién insertado
-    SELECT @id_factura = id_factura FROM INSERTED;
-
-    -- Ejecutar el procedimiento almacenado para actualizar la factura
-    EXEC sumar_detalles_factura @id_factura = @id_factura;
-
-    -- Calcular la diferencia entre el total de la factura y el crédito del proveedor
-    SELECT @credito_proveedor = p.credito - f.total FROM proveedores p
-    INNER JOIN facturas f ON p.id_proveedor = f.id_proveedor
-    WHERE f.id_factura = @id_factura;
-
-    -- Verificar si el crédito se vuelve negativo
-    IF @credito_proveedor >= 0
-    BEGIN
-        -- Actualizar el crédito del proveedor
-        UPDATE proveedores
-        SET credito = @credito_proveedor
-        WHERE id_proveedor = (SELECT id_proveedor FROM facturas WHERE id_factura = @id_factura);
-
-        -- Confirmar la transacción
-        COMMIT;
-    END
-
-    ELSE
-    BEGIN
-        -- Si el crédito se vuelve negativo, deshacer la transacción
-        ROLLBACK;
-        -- Lanzar un mensaje de advertencia
-         PRINT 'El total de la factura supera el crédito disponible del proveedor. El detalle compra proveedor no se ha guardado.'
-    END;
 END;
 
 
