@@ -239,7 +239,7 @@ INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
 fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
 VALUES(
 		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
-		(SELECT id_proveedor FROM proveedores WHERE nombre='San Cosme'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='Estética del Sur'),
 		'2023-04-01',
 		1,
 		'2024-12-01',
@@ -247,11 +247,23 @@ VALUES(
 		0,
 		0,
 		0);
+INSERT INTO detalles_compras_proveedores (id_producto, id_factura, cantidad, costo_unitario, iva)
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Nivea'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=0110),
+		10,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo Nivea'),
+		0),(
+		(SELECT id_producto FROM productos WHERE descripcion='Acondicionador Nivea'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=0110),
+		9,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Acondicionador Nivea'),
+		0);
 INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
 fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
 VALUES(
 		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
-		(SELECT id_proveedor FROM proveedores WHERE nombre='San Cosme'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='Margarita SA'),
 		'2023-04-02',
 		0,
 		'2023-04-02',
@@ -259,6 +271,19 @@ VALUES(
 		0,
 		0,
 		0);
+INSERT INTO detalles_compras_proveedores (id_producto, id_factura, cantidad, costo_unitario, iva)
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Tinte Nivea'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=0111),
+		8,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Tinte Nivea'),
+		0),(
+		(SELECT id_producto FROM productos WHERE descripcion='Gel Nivea'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=0111),
+		7,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Gel Nivea'),
+		0);
+
 INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
 fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
 VALUES(
@@ -270,6 +295,18 @@ VALUES(
 		0112,
 		0,
 		0,
+		0);
+INSERT INTO detalles_compras_proveedores (id_producto, id_factura, cantidad, costo_unitario, iva)
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Shampoo TRESemme'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=0112),
+		5,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo TRESemme'),
+		0),(
+		(SELECT id_producto FROM productos WHERE descripcion='Acondicionador TRESemme'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=0112),
+		2,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Acondicionador TRESemme'),
 		0);
 --facturas mes mayo
 --facturas mes junio
@@ -513,7 +550,7 @@ VALUES(
 		(SELECT id_proveedor FROM proveedores WHERE nombre='Margarita SA'),
 		'2023-12-02',
 		0,
-		'2024-12-01',
+		'2024-12-02',
 		1015,
 		0,
 		0,
@@ -531,7 +568,6 @@ VALUES (
 		4,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Tinte TRESemme'),
 		0);
-
 
 
 
