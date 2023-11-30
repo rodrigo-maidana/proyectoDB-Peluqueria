@@ -134,7 +134,7 @@ fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
 VALUES(
 		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
 		(SELECT id_proveedor FROM proveedores WHERE nombre='Estética del Sur'),
-		'2023-02-01',
+		'2023-02-03',
 		1,
 		'2023-12-31',
 		0106,
@@ -162,7 +162,7 @@ fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
 VALUES(
 		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
 		(SELECT id_proveedor FROM proveedores WHERE nombre='Estética del Sur'),
-		'2023-02-01',
+		'2023-03-01',
 		1,
 		'2023-12-31',
 		0107,
@@ -187,7 +187,7 @@ fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
 VALUES(
 		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
 		(SELECT id_proveedor FROM proveedores WHERE nombre='Estética del Sur'),
-		'2023-02-01',
+		'2023-03-02',
 		1,
 		'2023-12-31',
 		0108,
@@ -212,7 +212,7 @@ fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
 VALUES(
 		(SELECT id_deposito FROM depositos WHERE nombre='Salón'),
 		(SELECT id_proveedor FROM proveedores WHERE nombre='Margarita SA'),
-		'2023-02-01',
+		'2023-03-03',
 		1,
 		'2023-12-31',
 		0109,
@@ -231,7 +231,46 @@ VALUES (
 		3,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo TRESemme'),
 		0);
+
+
+select * from facturas
 --facturas mes abril
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
+fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='San Cosme'),
+		'2023-04-01',
+		1,
+		'2024-12-01',
+		0110,
+		0,
+		0,
+		0);
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
+fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='San Cosme'),
+		'2023-04-02',
+		0,
+		'2023-04-02',
+		0111,
+		0,
+		0,
+		0);
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
+fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='San Cosme'),
+		'2023-04-03',
+		0,
+		'2023-04-03',
+		0112,
+		0,
+		0,
+		0);
 --facturas mes mayo
 --facturas mes junio
 --facturas mes julio
