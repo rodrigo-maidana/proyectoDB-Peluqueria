@@ -127,12 +127,17 @@ INSERT INTO tipos_productos (nombre)
 VALUES ('Shampoo'),
        ('Acondicionador'),
        ('Tinte'),
-       ('Gel');
+       ('Gel'),
+	   ('Aerosol para el cabello'),
+	   ('Decolorante'),
+	   ('Peine');
 
 INSERT INTO marcas (nombre)
 VALUES ('Nivea'),
        ('Plusbelle'),
-       ('TRESemme');
+       ('TRESemme'),
+	   ('Dove'),
+	   ('Revlon');
 
 INSERT INTO depositos (nombre)
 VALUES ('Salón'),
@@ -182,6 +187,18 @@ VALUES
     ((SELECT id_marca FROM marcas WHERE nombre = 'Plusbelle'), (SELECT id_tipo_producto FROM tipos_productos WHERE nombre = 'Tinte'), 'Tinte Plusbelle', 46000, 10),
     ((SELECT id_marca FROM marcas WHERE nombre = 'Plusbelle'), (SELECT id_tipo_producto FROM tipos_productos WHERE nombre = 'Gel'), 'Gel Plusbelle', 37000, 10);
 
+-- Insertar productos para Dove
+INSERT INTO productos values(
+(SELECT id_marca FROM marcas WHERE nombre = 'Dove'),(SELECT id_tipo_producto FROM tipos_productos WHERE nombre = 'Shampoo'), 'Shampoo Dove', 35000,10),
+((SELECT id_marca FROM marcas WHERE nombre = 'Dove'),(SELECT id_tipo_producto FROM tipos_productos WHERE nombre = 'Acondicionador'), 'Acondicionador Dove',25000,5),
+((SELECT id_marca FROM marcas WHERE nombre = 'Dove'),(SELECT id_tipo_producto FROM tipos_productos WHERE nombre = 'Decolorante'), 'Decolorante Dove',27000,5)
+
+-- Insertar productos para Revlon
+INSERT INTO productos values
+((SELECT id_marca FROM marcas WHERE nombre = 'Revlon'),(SELECT id_tipo_producto FROM tipos_productos WHERE nombre = 'Gel'), 'Gel Revlon',10000,6),
+((SELECT id_marca FROM marcas WHERE nombre = 'Revlon'),(SELECT id_tipo_producto FROM tipos_productos WHERE nombre = 'Peine'),'Peine Revlon', 7500, 8)
+
+select * from productos
 -- Insertar productos por depósito con cantidades aleatorias
 -- Para el Salón (entre 1 y 5 unidades)
 INSERT INTO productos_por_depositos (id_producto, id_deposito, cantidad)
@@ -197,8 +214,12 @@ VALUES
 	(9, 1, FLOOR(RAND() * 5) + 1),
 	(10, 1, FLOOR(RAND() * 5) + 1),
 	(11, 1, FLOOR(RAND() * 5) + 1),
-	(12, 1, FLOOR(RAND() * 5) + 1);
-
+	(12, 1, FLOOR(RAND() * 5) + 1),
+	(13, 1, FLOOR(RAND() * 5) + 1),
+	(14, 1, FLOOR(RAND() * 5) + 1),
+	(15, 1, FLOOR(RAND() * 5) + 1),
+	(16, 1, FLOOR(RAND() * 5) + 1),
+	(17, 1, FLOOR(RAND() * 5) + 1);
 -- Para el Depósito (entre 15 y 20 unidades)
 INSERT INTO productos_por_depositos (id_producto, id_deposito, cantidad)
 VALUES
@@ -213,7 +234,12 @@ VALUES
 	(9, 2, FLOOR(RAND() * 6) + 15),
     (10, 2, FLOOR(RAND() * 6) + 15),
     (11, 2, FLOOR(RAND() * 6) + 15),
-    (12, 2, FLOOR(RAND() * 6) + 15);
+    (12, 2, FLOOR(RAND() * 6) + 15),
+	(13, 2, FLOOR(RAND() * 6) + 15),
+	(14, 2, FLOOR(RAND() * 6) + 15),
+	(15, 2, FLOOR(RAND() * 6) + 15),
+	(16, 2, FLOOR(RAND() * 6) + 15),
+	(17, 2, FLOOR(RAND() * 6) + 15);
 
 -- Insertar proveedores
 INSERT INTO proveedores (nombre, direccion, correo, credito)
@@ -228,6 +254,6 @@ SELECT * FROM sys.tables;
 --Ver opciones de algo
 exec sp_columns detalles_compras_proveedores;
 
-select * from facturas
+select * from productos
 
 EXEC sumar_detalles_factura @id_factura = 3;
