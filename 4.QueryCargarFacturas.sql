@@ -308,10 +308,107 @@ VALUES (
 		2,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Acondicionador TRESemme'),
 		0);
+select * from facturas
 --facturas mes mayo
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
+fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='San Cosme'),
+		'2023-05-01',
+		0,
+		'2023-05-01',
+		0113,
+		0,
+		0,
+		0);
+INSERT INTO detalles_compras_proveedores (id_producto, id_factura, cantidad, costo_unitario, iva)
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Tinte TRESemme'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=0113),
+		5,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Tinte TRESemme'),
+		0),(
+		(SELECT id_producto FROM productos WHERE descripcion='Gel TRESemme'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=0113),
+		2,
+		36000,
+		0);
 --facturas mes junio
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
+fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='San Cosme'),
+		'2023-06-01',
+		1,
+		'2024-06-01',
+		0114,
+		0,
+		0,
+		0);
+INSERT INTO detalles_compras_proveedores (id_producto, id_factura, cantidad, costo_unitario, iva)
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Plusbelle'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=0114),
+		5,
+		28000,
+		0),(
+		(SELECT id_producto FROM productos WHERE descripcion='Acondicionador Plusbelle'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=0114),
+		2,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Acondicionador Plusbelle'),
+		0);
 --facturas mes julio
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
+fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='San Cosme'),
+		'2023-07-01',
+		0,
+		'2023-07-01',
+		0115,
+		0,
+		0,
+		0);
+INSERT INTO detalles_compras_proveedores (id_producto, id_factura, cantidad, costo_unitario, iva)
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Tinte Plusbelle'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=0115),
+		5,
+		47000,
+		0),(
+		(SELECT id_producto FROM productos WHERE descripcion='Gel Plusbelle'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=0115),
+		2,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Gel Plusbelle'),
+		0);
 --facturas mes agosto
+INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
+fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
+VALUES(
+		(SELECT id_deposito FROM depositos WHERE nombre='Depósito'),
+		(SELECT id_proveedor FROM proveedores WHERE nombre='San Cosme'),
+		'2023-08-03',
+		0,
+		'2023-08-03',
+		0116,
+		0,
+		0,
+		0);
+INSERT INTO detalles_compras_proveedores (id_producto, id_factura, cantidad, costo_unitario, iva)
+VALUES (
+		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Dove'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=0116),
+		5,
+		36500,
+		0),(
+		(SELECT id_producto FROM productos WHERE descripcion='Acondicionador Dove'),
+		(SELECT id_factura FROM facturas WHERE numero_factura=0116),
+		2,
+		(SELECT costo_unitario FROM productos WHERE descripcion='Acondicionador Dove'),
+		0);
 
 --facturas mes septiembre
 INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
