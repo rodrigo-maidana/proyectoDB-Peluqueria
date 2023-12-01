@@ -105,12 +105,11 @@ select * from ranking_proveedores order by monto desc
 
 -- Consulta #7.
 -- Productos no comprados.
-DROP VIEW productos_no_comprados_por_fecha
 CREATE VIEW productos_no_comprados_por_fecha AS
 SELECT
     p.id_producto,
-    p.descripcion as nombre_producto,
-    p.costo_unitario as ultimo_precio,
+    p.descripcion AS nombre_producto,
+    p.costo_unitario AS ultimo_precio,
     MAX(f.fecha_compra) AS ultima_fecha_compra
 FROM
     productos p
@@ -118,30 +117,12 @@ LEFT JOIN
     detalles_compras_proveedores dcp ON p.id_producto = dcp.id_producto
 LEFT JOIN
     facturas f ON dcp.id_factura = f.id_factura
-WHERE
-    dcp.id_producto IS NULL
-    OR (dcp.id_producto IS NOT NULL AND f.fecha_compra IS NULL)
 GROUP BY
     p.id_producto, p.descripcion, p.costo_unitario;
-
 
 -- Consulta #7.
 -- Selecciona todos los productos no comprados en un rango de fechas específico
 SELECT *
 FROM productos_no_comprados_por_fecha
-WHERE ultima_fecha_compra IS NULL OR ultima_fecha_compra BETWEEN '2023-06-01' AND '2023-06-30';
-
-SELECT * FROM facturas
-WHERE fecha_compra BETWEEN '2023-05-01' AND '2023-05-30';
-
-SELECT dcp.*, p.descripcion FROM detalles_compras_proveedores dcp
-INNER JOIN productos p on dcp.id_producto = p.id_producto
-WHERE id_factura = 13
-
-
-
---productos comprados por fecha
-select p.id_producto, p.descripcion, f.fecha_compra from detalles_compras_proveedores as dcp
-INNER JOIN facturas as f ON f.id_deposito = dcp.id_factura
-INNER JOIN productos as p ON p.id_producto = dcp.id_producto
-ORDER BY fecha_compra
+WHERE ultima_fecha_compra IS NULL OR ultima_fecha_compra NOT BETWEEN '2023-03-30' AND '2023-12-30'
+ORDER BY ultima_fecha_compra;
