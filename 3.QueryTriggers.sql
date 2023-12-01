@@ -30,7 +30,7 @@ END;
 
 
 --actualizar productos_por_depositos despues de la insercion
-CREATE TRIGGER tr_insert_actualizar_depositos_al_transferir
+CREATE TRIGGER tr_insert_transferencia_producto
 ON detalles_transferencias_productos
 AFTER INSERT
 AS
@@ -52,7 +52,7 @@ BEGIN
     WHERE p.id_deposito = t.id_deposito_destino;
 END;
 
-CREATE TRIGGER tr_delete_actualizar_depositos_al_eliminar_transferencia
+CREATE TRIGGER tr_delete_transferencia_producto
 ON detalles_transferencias_productos
 AFTER DELETE
 AS
@@ -74,7 +74,7 @@ BEGIN
     WHERE p.id_deposito = t.id_deposito_destino;
 END;
 
-CREATE TRIGGER tr_update_actualizar_depositos_al_modificar_transferencia
+CREATE TRIGGER tr_update_transferencia_producto
 ON detalles_transferencias_productos
 AFTER UPDATE
 AS
@@ -98,7 +98,7 @@ BEGIN
     WHERE p.id_deposito = t.id_deposito_destino;
 END;
 
-CREATE TRIGGER tr_insert_actualizar_productos_por_deposito
+CREATE TRIGGER tr_insert_detalle_compra_proveedor
 ON detalles_compras_proveedores
 AFTER INSERT
 AS
@@ -156,7 +156,7 @@ BEGIN
     END;
 END;
 
-CREATE TRIGGER tr_delete_actualizar_depositos_al_transferir
+CREATE TRIGGER tr_delete_detalle_compra_proveedor
 ON detalles_compras_proveedores
 AFTER DELETE
 AS
@@ -177,7 +177,7 @@ BEGIN
 END;
 
 DROP TRIGGER tr_udpate_actualizar_depositos_al_transferir
-CREATE TRIGGER tr_udpate_actualizar_depositos_al_transferir
+CREATE TRIGGER tr_update_detalle_compra_proveedor
 ON detalles_compras_proveedores
 AFTER UPDATE
 AS
@@ -237,7 +237,7 @@ END;
 
 -- trigger detalles_ordenes_de_pago
 --restar el importe al saldo de la factura
-CREATE TRIGGER tr_actualizar_saldo_pendiente
+CREATE TRIGGER tr_insert_detalle_orden_de_pago
 ON detalles_ordenes_de_pagos
 AFTER INSERT
 AS
@@ -259,7 +259,7 @@ BEGIN
 END;
 --actualizar detalles_ordenes_de_pago
 -- Crear un trigger después de actualizar en detalles_ordenes_de_pagos
-CREATE TRIGGER tr_actualizar_saldo_pendiente_al_editar
+CREATE TRIGGER tr_update_detalle_orden_de_pago
 ON detalles_ordenes_de_pagos
 AFTER UPDATE
 AS
@@ -283,7 +283,7 @@ BEGIN
     JOIN inserted i ON o.id_orden_de_pago = i.id_orden_de_pago;
 END;
 -- Trigger al eliminar en detalles_ordenes_de_pagos
-CREATE TRIGGER tr_eliminar_detalle_orden_de_pago
+CREATE TRIGGER tr_delete_detalle_orden_de_pago
 ON detalles_ordenes_de_pagos
 AFTER DELETE
 AS
