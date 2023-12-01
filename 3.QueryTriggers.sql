@@ -98,9 +98,6 @@ BEGIN
     WHERE p.id_deposito = t.id_deposito_destino;
 END;
 
-
-DROP TRIGGER tr_insert_actualizar_productos_por_deposito
-
 CREATE TRIGGER tr_insert_actualizar_productos_por_deposito
 ON detalles_compras_proveedores
 AFTER INSERT
@@ -121,29 +118,26 @@ BEGIN
     DECLARE @id_factura INT;
     DECLARE @id_producto INT;
     DECLARE @ultimoCosto INT;
-    DECLARE @credito_proveedor INT;
+	DECLARE @credito_utilizado INT;
+	DECLARE @id_proveedor INT;
 
     SELECT @id_factura = id_factura, @id_producto = id_producto, @ultimoCosto = costo_unitario FROM inserted;
+	SELECT @id_proveedor = id_proveedor FROM facturas WHERE id_factura = @id_factura;
 
-    EXEC sumar_detalles_factura @id_factura = @id_factura;
+	EXEC sumar_detalles_factura @id_factura = @id_factura;
     EXEC act_costo_unitario @id_producto = @id_producto, @costoActualizado = @ultimoCosto;
 
     -- Verificar si la factura es a crédito antes de calcular el crédito del proveedor
     IF (SELECT condicion_compra FROM facturas WHERE id_factura = @id_factura) = 1
     BEGIN
-        -- Calcular la diferencia entre el total de la factura y el crédito del proveedor
-        SELECT @credito_proveedor = p.credito - f.total FROM proveedores p
-        INNER JOIN facturas f ON p.id_proveedor = f.id_proveedor
-        WHERE f.id_factura = @id_factura;
+        -- Calcular el saldo a crédito utilizado del proveedor
+		SELECT @credito_utilizado = ISNULL(SUM(saldo_pendiente), 0)
+		FROM facturas
+		WHERE id_proveedor = @id_proveedor;
 
         -- Verificar si el crédito se vuelve negativo
-        IF @credito_proveedor >= 0
+        IF @credito_utilizado <= (SELECT credito FROM proveedores WHERE id_proveedor = @id_proveedor)
         BEGIN
-            -- Actualizar el crédito del proveedor
-            UPDATE proveedores
-            SET credito = @credito_proveedor
-            WHERE id_proveedor = (SELECT id_proveedor FROM facturas WHERE id_factura = @id_factura);
-
             -- Confirmar la transacción
             COMMIT;
         END
@@ -161,7 +155,6 @@ BEGIN
         COMMIT;
     END;
 END;
-
 
 CREATE TRIGGER tr_delete_actualizar_depositos_al_transferir
 ON detalles_compras_proveedores

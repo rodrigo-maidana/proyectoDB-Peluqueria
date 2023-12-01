@@ -372,6 +372,8 @@ VALUES(
 		0,
 		0,
 		0);
+
+select * from facturas where numero_factura='0115'
 INSERT INTO detalles_compras_proveedores (id_producto, id_factura, cantidad, costo_unitario, iva)
 VALUES (
 		(SELECT id_producto FROM productos WHERE descripcion='Tinte Plusbelle'),
@@ -436,6 +438,7 @@ VALUES (
 		14,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Tinte TRESemme'),
 		0);
+
 
 INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
 fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
@@ -506,12 +509,12 @@ INSERT INTO detalles_compras_proveedores
 VALUES (
 		(SELECT id_producto FROM productos WHERE descripcion='Shampoo Nivea'),
 		(SELECT id_factura FROM facturas WHERE numero_factura=1008),
-		9,
+		2,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Shampoo Nivea'),
 		0),(
 		(SELECT id_producto FROM productos WHERE descripcion='Acondicionador Plusbelle'),
 		(SELECT id_factura FROM facturas WHERE numero_factura=1008),
-		21,
+		1,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Acondicionador Plusbelle'),
 		0);
 --factura mes noviembre
@@ -582,7 +585,7 @@ INSERT INTO detalles_compras_proveedores
 VALUES (
 		(SELECT id_producto FROM productos WHERE descripcion='Gel Tresemme'),
 		(SELECT id_factura FROM facturas WHERE numero_factura=1011),
-		2,
+		1,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Gel Tresemme'),
 		0);
 
@@ -665,8 +668,5 @@ VALUES (
 		4,
 		(SELECT costo_unitario FROM productos WHERE descripcion='Tinte TRESemme'),
 		0);
-
-
-
 
 select * from facturas

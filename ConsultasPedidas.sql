@@ -129,7 +129,15 @@ GROUP BY
 -- Selecciona todos los productos no comprados en un rango de fechas específico
 SELECT *
 FROM productos_no_comprados_por_fecha
-WHERE ultima_fecha_compra IS NULL OR ultima_fecha_compra BETWEEN '2023-12-02' AND '2023-12-30';
+WHERE ultima_fecha_compra IS NULL OR ultima_fecha_compra BETWEEN '2023-06-01' AND '2023-06-30';
+
+SELECT * FROM facturas
+WHERE fecha_compra BETWEEN '2023-05-01' AND '2023-05-30';
+
+SELECT dcp.*, p.descripcion FROM detalles_compras_proveedores dcp
+INNER JOIN productos p on dcp.id_producto = p.id_producto
+WHERE id_factura = 13
+
 
 
 --productos comprados por fecha

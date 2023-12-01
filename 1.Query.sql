@@ -198,7 +198,6 @@ INSERT INTO productos values
 ((SELECT id_marca FROM marcas WHERE nombre = 'Revlon'),(SELECT id_tipo_producto FROM tipos_productos WHERE nombre = 'Gel'), 'Gel Revlon',10000,6),
 ((SELECT id_marca FROM marcas WHERE nombre = 'Revlon'),(SELECT id_tipo_producto FROM tipos_productos WHERE nombre = 'Peine'),'Peine Revlon', 7500, 8)
 
-select * from productos
 -- Insertar productos por depósito con cantidades aleatorias
 -- Para el Salón (entre 1 y 5 unidades)
 INSERT INTO productos_por_depositos (id_producto, id_deposito, cantidad)
