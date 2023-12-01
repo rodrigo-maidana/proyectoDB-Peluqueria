@@ -439,7 +439,6 @@ VALUES (
 		(SELECT costo_unitario FROM productos WHERE descripcion='Tinte TRESemme'),
 		0);
 
-
 INSERT INTO facturas (id_deposito,id_proveedor,fecha_compra,condicion_compra,
 fecha_vencimiento,numero_factura,total,saldo_pendiente, total_iva)
 VALUES(

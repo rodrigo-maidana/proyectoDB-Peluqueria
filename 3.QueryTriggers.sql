@@ -176,6 +176,7 @@ BEGIN
     EXEC sumar_detalles_factura @id_factura = @id_factura;
 END;
 
+DROP TRIGGER tr_udpate_actualizar_depositos_al_transferir
 CREATE TRIGGER tr_udpate_actualizar_depositos_al_transferir
 ON detalles_compras_proveedores
 AFTER UPDATE
@@ -194,28 +195,42 @@ BEGIN
     DECLARE @id_factura INT;
 	DECLARE @id_producto INT;
 	DECLARE @costoProducto INT;
-	DECLARE @credito_proveedor_anterior INT
-    DECLARE @credito_proveedor_nuevo INT
+	DECLARE @id_proveedor INT;
+	DECLARE @credito_utilizado INT;
 
     SELECT @id_factura = i.id_factura,@costoProducto = costo_unitario, @id_producto = id_producto FROM inserted i;
+	SELECT @id_proveedor = id_proveedor FROM facturas WHERE id_factura = @id_factura;
 
     EXEC sumar_detalles_factura @id_factura = @id_factura;
 	EXEC act_costo_unitario @id_producto = @id_producto, @costoActualizado = @costoProducto;
 
-	SELECT @id_factura = id_factura, @credito_proveedor_anterior = cantidad * costo_unitario
-    FROM DELETED;
-	-- Sumar el monto anterior al crédito del proveedor
-    UPDATE proveedores
-    SET credito = credito + @credito_proveedor_anterior
-    WHERE id_proveedor = (SELECT id_proveedor FROM facturas WHERE id_factura = @id_factura);
+    -- Verificar si la factura es a crédito antes de calcular el crédito del proveedor
+    IF (SELECT condicion_compra FROM facturas WHERE id_factura = @id_factura) = 1
+    BEGIN
+        -- Calcular el saldo a crédito utilizado del proveedor
+		SELECT @credito_utilizado = ISNULL(SUM(saldo_pendiente), 0)
+		FROM facturas
+		WHERE id_proveedor = @id_proveedor;
 
-	-- Obtener el nuevo monto
-    SELECT @credito_proveedor_nuevo = cantidad * costo_unitario FROM INSERTED;
-
-    -- Restar el nuevo monto al crédito del proveedor
-    UPDATE proveedores
-    SET credito = credito - @credito_proveedor_nuevo
-    WHERE id_proveedor = (SELECT id_proveedor FROM facturas WHERE id_factura = @id_factura);
+        -- Verificar si el crédito se vuelve negativo
+        IF @credito_utilizado <= (SELECT credito FROM proveedores WHERE id_proveedor = @id_proveedor)
+        BEGIN
+            -- Confirmar la transacción
+            COMMIT;
+        END
+        ELSE
+        BEGIN
+            -- Si el crédito se vuelve negativo, deshacer la transacción
+            ROLLBACK;
+            -- Lanzar un mensaje de advertencia
+            PRINT 'El total de la factura supera el crédito disponible del proveedor. El detalle compra proveedor no se ha guardado.'
+        END;
+    END
+    ELSE
+    BEGIN
+        -- Si la factura no es a crédito, confirmar la transacción
+        COMMIT;
+    END;
 END;
 
 
@@ -288,43 +303,5 @@ BEGIN
     -- Se actualiza el saldo pendiente en factura
     UPDATE facturas
     SET saldo_pendiente = saldo_pendiente + @importe_eliminar
-    WHERE id_factura = @id_factura;
-END;
-
-
-CREATE TRIGGER tr_actualizar_detalle_compra
-ON detalles_compras_proveedores
-AFTER UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-    DECLARE @id_factura INT
-    DECLARE @credito_proveedor_anterior INT
-    DECLARE @credito_proveedor_nuevo INT
-
-    -- Obtener el id_factura y el monto anterior
-    SELECT @id_factura = id_factura, @credito_proveedor_anterior = cantidad * costo_unitario
-    FROM DELETED;
-
-    -- Sumar el monto anterior al crédito del proveedor
-    UPDATE proveedores
-    SET credito = credito + @credito_proveedor_anterior
-    WHERE id_proveedor = (SELECT id_proveedor FROM facturas WHERE id_factura = @id_factura);
-
-    -- Obtener el nuevo monto
-    SELECT @credito_proveedor_nuevo = cantidad * costo_unitario FROM INSERTED;
-
-    -- Restar el nuevo monto al crédito del proveedor
-    UPDATE proveedores
-    SET credito = credito - @credito_proveedor_nuevo
-    WHERE id_proveedor = (SELECT id_proveedor FROM facturas WHERE id_factura = @id_factura);
-
-    -- Restar el nuevo monto al total de la factura
-    UPDATE facturas
-    SET total = total - @credito_proveedor_nuevo,
-        saldo_pendiente = CASE
-                            WHEN condicion_compra = 1 THEN total - @credito_proveedor_nuevo
-                            ELSE 0
-                         END
     WHERE id_factura = @id_factura;
 END;
